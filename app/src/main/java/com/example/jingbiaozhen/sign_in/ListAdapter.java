@@ -15,9 +15,6 @@ import android.widget.TextView;
 
 import com.example.jingbiaozhen.sign_in.bean.ItemDesc;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>
 {
 
@@ -64,16 +61,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>
     public class ViewHolder extends RecyclerView.ViewHolder
     {
 
-        @BindView(R.id.title_tv)
         TextView mTitleTv;
 
-        @BindView(R.id.desc_tv)
         TextView mDescTv;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
-            ButterKnife.bind(itemView);
+            mTitleTv=itemView.findViewById(R.id.title_tv);
+            mDescTv=itemView.findViewById(R.id.desc_tv);
         }
     }
 }

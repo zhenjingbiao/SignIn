@@ -4,7 +4,6 @@ package com.example.jingbiaozhen.sign_in;
  * 签到页面activity
  **/
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -76,14 +75,9 @@ public class SignInActivity extends Activity
             mSignInBean = (SignInBean) intent.getSerializableExtra("signInfo");
             if (mSignInBean != null)
             {
-                if (mSignInBean.signedList != null)
-                {
-                    mSignedList = mSignInBean.signedList;
-                }
-                else
-                {
-                    mSignedList = new ArrayList<>();
-                }
+
+                mSignedList = mSignInBean.signedList;
+
                 if (!TextUtils.isEmpty(mSignInBean.courseName))
                 {
                     mCourseNameTv.setText(mSignInBean.courseName);
@@ -92,13 +86,6 @@ public class SignInActivity extends Activity
                 mLocationRv.setLayoutManager(layoutManager);
                 LocationAdapter locationAdapter = new LocationAdapter(this, mSignedList);
                 mLocationRv.setAdapter(locationAdapter);
-                if (mSignInBean.isSigned)
-                {
-                    mSignInTv.setVisibility(View.GONE);
-                    mCountdownTv.setText("你已完成签到");
-                    mSignInBtn.setEnabled(false);
-                    mLocationRv.setEnabled(false);
-                }
                 locationAdapter.setOnLocationCheckListener(new LocationAdapter.OnLocationCheckListener()
                 {
                     @Override
@@ -142,6 +129,7 @@ public class SignInActivity extends Activity
 
     }
 
+
     /**
      * 点击签到
      */
@@ -165,13 +153,13 @@ public class SignInActivity extends Activity
         String currentTime = TimeUtils.getCurrentTime();
         String username = getSharedPreferences("username", MODE_PRIVATE).getString("username", "");
         OkHttpUtils.post().url(Constants.USER_SIGN).addParams("course_id", course).addParams("current_time",
-                currentTime).addParams("username", username).addParams("position",
+                currentTime).addParams("student_no", username).addParams("position",
                         mSelectPosition + "").build().execute(new StringCallback()
                         {
                             @Override
                             public void onError(Call call, Exception e, int id)
                             {
-
+                                Toast.makeText(SignInActivity.this, "网络异常"+e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
@@ -182,6 +170,8 @@ public class SignInActivity extends Activity
                                 {
                                     Toast.makeText(SignInActivity.this, "签到成功", Toast.LENGTH_SHORT).show();
 
+                                }else {
+                                    Toast.makeText(SignInActivity.this, model.errorInfo, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

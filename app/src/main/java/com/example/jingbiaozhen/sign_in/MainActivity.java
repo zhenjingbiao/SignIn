@@ -51,6 +51,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mCountDownBtn.setOnClickRefresh(true);
     }
 
     @OnClick(R.id.loginBtn)
@@ -69,15 +70,16 @@ public class MainActivity extends Activity
         }
         else
         {
-            MainActivity.this.startActivity(new Intent(MainActivity.this, HomeActivity.class));
-            Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-            //loginIn();
+          /*  MainActivity.this.startActivity(new Intent(MainActivity.this, HomeActivity.class));
+            Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();*/
+            loginIn();
         }
     }
 
     private void loginIn()
     {
-        OkHttpUtils.post().url(Constants.USER_LOGIN).addParams("user_name", username).addParams("user_password",
+        OkHttpUtils.post().url(Constants.USER_LOGIN).addParams("student_no", username)
+                .addParams("student_password",
                 password).build().execute(new StringCallback()
         {
             @Override
@@ -100,7 +102,7 @@ public class MainActivity extends Activity
                 }
                 else
                 {
-                    Toast.makeText(MainActivity.this, model.exceptionInfo, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, model.errorInfo, Toast.LENGTH_SHORT).show();
                 }
             }
         });

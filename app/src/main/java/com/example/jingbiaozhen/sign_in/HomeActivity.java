@@ -1,6 +1,5 @@
 package com.example.jingbiaozhen.sign_in;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -10,23 +9,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.jingbiaozhen.sign_in.bean.BaseLocalModel;
-import com.example.jingbiaozhen.sign_in.bean.SignInBean;
 import com.example.jingbiaozhen.sign_in.fragment.LeaveFragment;
 import com.example.jingbiaozhen.sign_in.fragment.LeaveListFragment;
 import com.example.jingbiaozhen.sign_in.fragment.ScoreFragment;
 import com.example.jingbiaozhen.sign_in.fragment.SignInFragment;
-import com.example.jingbiaozhen.sign_in.utils.Constants;
-import com.example.jingbiaozhen.sign_in.utils.JsonHelper;
-import com.yzq.zxinglibrary.common.Constant;
-import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Call;
 
 /*
  * Created by jingbiaozhen on 2018/5/23.
@@ -34,6 +24,9 @@ import okhttp3.Call;
 
 public class HomeActivity extends FragmentActivity
 {
+
+    private static final String TAG = "HomeActivity";
+
     public static final int REQUEST_CODE_SCAN = 10;
 
     @BindView(R.id.frame_content)
@@ -93,51 +86,4 @@ public class HomeActivity extends FragmentActivity
         return view;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // 扫描二维码/条码回传
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK)
-        {
-            if (data != null)
-            {
-                String content = data.getStringExtra(Constant.CODED_CONTENT);
-                queryCourseAndSign(content);
-
-            }
-        }
-    }
-
-    private void queryCourseAndSign(String content)
-    {
-        String username = getSharedPreferences("user", MODE_PRIVATE).getString("username", "");
-        OkHttpUtils.post().url(Constants.UPDATE_SIGN).addParams("course_id", content).addParams("username",
-                username).build().execute(new StringCallback()
-                {
-                    @Override
-                    public void onError(Call call, Exception e, int id)
-                    {
-                        Toast.makeText(HomeActivity.this, "课程查询失败", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id)
-                    {
-                        BaseLocalModel model = JsonHelper.parseJson(response);
-                        SignInBean signInBean = new SignInBean();
-                        if (model.isSucess())
-                        {
-                            Intent intent = new Intent(HomeActivity.this, SignInActivity.class);
-                            intent.putExtra("signInfo", signInBean);
-                            HomeActivity.this.startActivity(intent);
-                        }
-                        else
-                        {
-                            Toast.makeText(HomeActivity.this, "课程查询失败", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
 }

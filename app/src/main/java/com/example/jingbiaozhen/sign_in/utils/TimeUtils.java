@@ -15,6 +15,11 @@ public class TimeUtils
         return df.format(System.currentTimeMillis());
     }
 
+    public static String getCurrentData(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        return df.format(System.currentTimeMillis());
+    }
+
     public static long getTimeDifference(String givenTime)
     {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

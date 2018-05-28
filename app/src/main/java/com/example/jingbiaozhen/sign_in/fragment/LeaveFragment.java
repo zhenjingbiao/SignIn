@@ -10,6 +10,8 @@ import java.util.Calendar;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -32,6 +34,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class LeaveFragment extends BaseFragment implements DatePicker.OnDateChangedListener
 {
+    private static final String TAG = "LeaveFragment";
+
     @BindView(R.id.leave_content_et)
     EditText mLeaveContentEt;
 
@@ -88,34 +92,45 @@ public class LeaveFragment extends BaseFragment implements DatePicker.OnDateChan
     /**
      * 提交请假信息
      */
-    private void submitLeaveInfo() {
-        String leaveInfo=mLeaveContentEt.getText().toString();
-        String leaveTime=mLeaveTimeTv.getText().toString();
-        String username=mActivity.getSharedPreferences("user", MODE_PRIVATE).getString("username","");
-        OkHttpUtils.post().url(Constants.UPLOAD_LEAVE_INFO).addParams("leave_info",leaveInfo)
-                .addParams("user_name",username).addParams("leave_time",leaveTime).build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Toast.makeText(mActivity, "请假申请提交失败", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        BaseLocalModel model= JsonHelper.parseJson(response);
-                        if(model.isSucess()){
-                            Toast.makeText(mActivity, "请假申请提交成功", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(mActivity, "请假申请提交失败", Toast.LENGTH_SHORT).show();
+    private void submitLeaveInfo()
+    {
+        String leaveInfo = mLeaveContentEt.getText().toString();
+        String leaveTime = mLeaveTimeTv.getText().toString();
+        if (TextUtils.isEmpty(leaveInfo) || TextUtils.isEmpty(leaveTime))
+        {
+            Toast.makeText(mActivity, "请将信息填写完整", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            String username = mActivity.getSharedPreferences("user", MODE_PRIVATE).getString("username", "");
+            Log.d(TAG, "submitLeaveInfo: username" + username);
+            OkHttpUtils.post().url(Constants.UPLOAD_LEAVE_INFO).addParams("holiday_reason", leaveInfo).addParams(
+                    "student_no", username).addParams("holiday_time", leaveTime).build().execute(new StringCallback()
+                    {
+                        @Override
+                        public void onError(Call call, Exception e, int id)
+                        {
+                            Toast.makeText(mActivity, "网络异常" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
+
+                        @Override
+                        public void onResponse(String response, int id)
+                        {
+                            Log.d(TAG, "onResponse: response" + response);
+                            BaseLocalModel model = JsonHelper.parseJson(response);
+                            Toast.makeText(mActivity, model.errorInfo, Toast.LENGTH_SHORT).show();
+                            mLeaveContentEt.setText("");
+                        }
+                    });
+        }
+
     }
+
+    AlertDialog dialog;
 
     private void selectLeaveTime()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        final AlertDialog dialog = builder.create();
 
         builder.setPositiveButton("设置", new DialogInterface.OnClickListener()
         {
@@ -140,10 +155,11 @@ public class LeaveFragment extends BaseFragment implements DatePicker.OnDateChan
                 dialog.dismiss();
             }
         });
+        dialog = builder.create();
         View dialogView = View.inflate(mActivity, R.layout.dialog_date, null);
-        final DatePicker datePicker =  dialogView.findViewById(R.id.datePicker);
+        final DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
 
-        dialog.setTitle("设置日期");
+        // dialog.setTitle("设置日期");
         dialog.setView(dialogView);
         dialog.show();
         // 初始化日期监听事件

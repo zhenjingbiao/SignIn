@@ -12,8 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:gravity="center"
         android:text="首页"
         android:textColor="@drawable/tab_text"
-        android:textSize="12sp"
+        android:textSize="16sp"
         />
 </RelativeLayout>

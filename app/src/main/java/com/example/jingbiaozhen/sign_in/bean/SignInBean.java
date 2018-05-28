@@ -4,6 +4,7 @@ package com.example.jingbiaozhen.sign_in.bean;
  **/
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SignInBean implements Serializable
@@ -14,9 +15,20 @@ public class SignInBean implements Serializable
 
     public String deadline;// 截至签到时间
 
-    public boolean isSigned;// 是否已经签到
+    public List<Seat> signedList ;// 已签到座位列表
 
-    public List<Seat> signedList;// 已签到座位列表
+    public List<Seat> getInitSignList()
+    {
+        List<Seat>initSignList=new ArrayList<>(252);
+        for (int i = 0; i < 252; i++)
+        {
+            Seat seat = new Seat();
+            seat.location = i;
+            seat.isSigned = false;
+            initSignList.add(seat);
+        }
+        return initSignList;
+    }
 
     public class Seat
     {
@@ -25,4 +37,13 @@ public class SignInBean implements Serializable
         public boolean isSigned;
     }
 
+    @Override
+    public String toString() {
+        return "SignInBean{" +
+                "courseId='" + courseId + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", deadline='" + deadline + '\'' +
+                ", signedList=" + signedList +
+                '}';
+    }
 }

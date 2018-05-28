@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="请假流程"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textSize="18sp"
@@ -31,10 +31,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="202dp"
+        android:background="@drawable/edit_bg"
         android:layout_marginTop="8dp"
         android:hint="请输入请假原因"
         android:maxLines="7"
+        android:lines="6"
         android:textAlignment="textStart"
+        android:gravity="start"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +47,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_bias="1.0"
-        tools:lines="7"/>
+        />
 
     <TextView
         android:id="@+id/select_leave_tv"
@@ -53,7 +56,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="点我选择请假日期:"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/black"
@@ -65,7 +68,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_bias="0.171"
-        tools:text="您选择的请假日期为："/>
+        />
 
     <TextView
         android:id="@+id/leave_time_tv"
@@ -75,8 +78,12 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="28dp"
-        android:text="TextView"
+        android:text="2018年5月19日"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
+        android:typeface="normal"
         app:layout_constraintBottom_toBottomOf="@+id/leave_content_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -84,7 +91,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/select_leave_tv"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.093"
+        app:layout_constraintVertical_bias="0.091"
         tools:text="2018年5月19日"/>
 
     <Button
@@ -92,9 +99,9 @@
         style="@android:style/Widget.DeviceDefault.Light.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="20dp"
         android:background="@color/colorTheme"
-        android:text="提交"
+        android:text="提交申请"
         android:textColor="@color/detail_bgColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
