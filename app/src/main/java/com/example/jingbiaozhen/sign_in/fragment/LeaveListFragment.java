@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -45,8 +44,12 @@ public class LeaveListFragment extends BaseFragment
     }
 
     @Override
-    protected void initData(Bundle bundle)
-    {
+    public void onResume() {
+        super.onResume();
+        getLeaveList();
+    }
+
+    private void getLeaveList() {
         String username = mActivity.getSharedPreferences("user", Context.MODE_PRIVATE).getString("username", "");
 
         OkHttpUtils.post().url(Constants.QUERY_LEAVE_LIST).addParams("student_no", username).build().execute(

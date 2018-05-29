@@ -23,8 +23,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     private List<SignInBean.Seat> mLocationList;
 
-    private boolean isSelected;
-
     public LocationAdapter(Context context, List<SignInBean.Seat> locationList)
     {
         mContext = context;
@@ -39,8 +37,10 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         return new ViewHolder(view);
     }
 
+    private Integer selectedPosition;
+
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position)
     {
         SignInBean.Seat location = mLocationList.get(position);
         final boolean isCheck = location.isSigned;
@@ -56,25 +56,27 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b)
                 {
-                    if (!isSelected)
+                    if (selectedPosition == null||selectedPosition==holder.getAdapterPosition())
                     {
                         if (b)
                         {
                             Toast.makeText(mContext, "您选择的座位号是" + holder.getAdapterPosition(),
                                     Toast.LENGTH_SHORT).show();
-                            isSelected = true;
+                            selectedPosition = holder.getAdapterPosition();
                         }
                         else
                         {
                             Toast.makeText(mContext, "您已取消选择的座位号" + holder.getAdapterPosition(),
                                     Toast.LENGTH_SHORT).show();
-                            isSelected = false;
+                            selectedPosition = null;
                         }
-                        mCheckListener.onLocationCheck(holder.getAdapterPosition(), b,isSelected);
+                        mCheckListener.onLocationCheck(selectedPosition, b);
 
                     }
                     else
                     {
+                        holder.mCheckBox.setChecked(false);
+                       // mCheckListener.onLocationCheck(null, false);
                         Toast.makeText(mContext, "只能选择一个座位", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -103,7 +105,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     public interface OnLocationCheckListener
     {
-        void onLocationCheck(int position, boolean isCheck,boolean isSelected);
+        void onLocationCheck(Integer position, boolean isCheck);
     }
 
     private OnLocationCheckListener mCheckListener;

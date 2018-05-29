@@ -6,6 +6,8 @@ package com.example.jingbiaozhen.sign_in.utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.example.jingbiaozhen.sign_in.bean.BaseLocalModel;
 
 
@@ -26,5 +28,9 @@ public class JsonHelper
             model.exceptionInfo = e.getMessage();
         }
         return model;
+    }
+    public static BaseLocalModel parseJson(String TAG,String json){
+        Log.d(TAG, "onResponse: json"+json);
+       return parseJson( json);
     }
 }

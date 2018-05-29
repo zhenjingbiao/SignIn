@@ -4,22 +4,25 @@ package com.example.jingbiaozhen.sign_in;
  * 签到页面activity
  **/
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jingbiaozhen.sign_in.bean.BaseLocalModel;
+import com.example.jingbiaozhen.sign_in.bean.Course;
 import com.example.jingbiaozhen.sign_in.bean.SignInBean;
 import com.example.jingbiaozhen.sign_in.utils.Constants;
 import com.example.jingbiaozhen.sign_in.utils.JsonHelper;
@@ -34,6 +37,8 @@ import okhttp3.Call;
 
 public class SignInActivity extends Activity
 {
+    private static final String TAG = "SignInActivity";
+
     @BindView(R.id.location_rv)
     RecyclerView mLocationRv;
 
@@ -49,13 +54,15 @@ public class SignInActivity extends Activity
     @BindView(R.id.sign_in_btn)
     Button mSignInBtn;
 
-    private SignInBean mSignInBean;
+    private Integer mSelectPosition;
 
-    private List<SignInBean.Seat> mSignedList;
+    private Course mCourse;
 
-    private boolean mIsSelected;
+    private SignInBean mSignInBean = new SignInBean();
 
-    private int mSelectPosition;
+    List<SignInBean.Seat> initSeatList = mSignInBean.getInitSignList();
+
+    private LocationAdapter locationAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -64,7 +71,77 @@ public class SignInActivity extends Activity
         setContentView(R.layout.activity_sign_in);
         ButterKnife.bind(this);
         initData();
+        loadSeatList();
 
+    }
+
+    private void loadSeatList()
+    {
+        String data = TimeUtils.getCurrentData();
+        String username = getSharedPreferences("user", MODE_PRIVATE).getString("username", "");
+        Log.d(TAG, "queryCourseAndSign: 参数" + "student_no" + username);
+        Log.d(TAG, "queryCourseAndSign: 参数" + "sign_date" + data);
+        Log.d(TAG, "queryCourseAndSign: 参数" + "courseId" + mCourse.courseId);
+        OkHttpUtils.post().url(Constants.QUERY_SIGN_INFO).addParams("course_id", mCourse.courseId).addParams(
+                "student_no", username).addParams("sign_date", data).build().execute(new StringCallback()
+                {
+                    @Override
+                    public void onError(Call call, Exception e, int id)
+                    {
+                        Toast.makeText(SignInActivity.this, "查询失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id)
+                    {
+                        Log.d(TAG, "onResponse: response" + response);
+                        BaseLocalModel model = JsonHelper.parseJson(response);
+
+                        if (model.isSucess())
+                        {
+
+                            JSONArray jo = model.data;
+                            for (int i = 0; i < jo.length(); i++)
+                            {
+                                JSONObject jsonObject = jo.optJSONObject(i);
+                                for (SignInBean.Seat seat : initSeatList)
+                                {
+                                    int seatNo = Integer.parseInt(jsonObject.optString("seat_no"));
+                                    if (seatNo == seat.location)
+                                    {
+                                        seat.isSigned = true;
+                                    }
+                                }
+                            }
+                            mSignInBean.signedList = initSeatList;
+                            locationAdapter.notifyDataSetChanged();
+                        }
+                        else
+                        {
+                            Toast.makeText(SignInActivity.this, model.errorInfo, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void initRecycleViewData(List<SignInBean.Seat> seatList)
+    {
+        if (!seatList.isEmpty())
+        {
+            GridLayoutManager layoutManager = new GridLayoutManager(this, 14);
+            mLocationRv.setLayoutManager(layoutManager);
+            locationAdapter = new LocationAdapter(this, seatList);
+            mLocationRv.setAdapter(locationAdapter);
+            locationAdapter.setOnLocationCheckListener(new LocationAdapter.OnLocationCheckListener()
+            {
+                @Override
+                public void onLocationCheck(Integer position, boolean isCheck)
+                {
+                    mSelectPosition = position;
+                }
+            });
+
+        }
     }
 
     private void initData()
@@ -72,63 +149,24 @@ public class SignInActivity extends Activity
         Intent intent = getIntent();
         if (intent != null)
         {
-            mSignInBean = (SignInBean) intent.getSerializableExtra("signInfo");
-            if (mSignInBean != null)
+
+            mCourse = (Course) intent.getSerializableExtra("course");
+            if (mCourse != null)
             {
-
-                mSignedList = mSignInBean.signedList;
-
-                if (!TextUtils.isEmpty(mSignInBean.courseName))
+                if (!TextUtils.isEmpty(mCourse.courseName))
                 {
-                    mCourseNameTv.setText(mSignInBean.courseName);
+                    mCourseNameTv.setText(mCourse.courseName);
                 }
-                GridLayoutManager layoutManager = new GridLayoutManager(this, 18);
-                mLocationRv.setLayoutManager(layoutManager);
-                LocationAdapter locationAdapter = new LocationAdapter(this, mSignedList);
-                mLocationRv.setAdapter(locationAdapter);
-                locationAdapter.setOnLocationCheckListener(new LocationAdapter.OnLocationCheckListener()
+                initRecycleViewData(initSeatList);
+                if (!TextUtils.isEmpty(mCourse.deadline))
                 {
-                    @Override
-                    public void onLocationCheck(int position, boolean isCheck, boolean isSelected)
-                    {
-                        mSelectPosition = position;
-                        mIsSelected = isSelected;
-                    }
-                });
-
-                if (!TextUtils.isEmpty(mSignInBean.deadline))
-                {
-                    long time = TimeUtils.getTimeDifference(mSignInBean.deadline);
-                    if (time > 0)
-                    {
-                        // 计时器
-                        CountDownTimer countDownTimer = new CountDownTimer(time, 1000)
-                        {
-                            @Override
-                            public void onTick(long l)
-                            {
-                                mCountdownTv.setText(TimeUtils.formatDuring(l));
-                            }
-
-                            @Override
-                            public void onFinish()
-                            {
-                                mSignInTv.setVisibility(View.GONE);
-                                mCountdownTv.setText("已截止签到");
-                                mSignInBtn.setEnabled(false);
-                                mLocationRv.setEnabled(false);
-                            }
-                        }.start();
-                    }
-
+                    mCountdownTv.setText(mCourse.deadline);
                 }
 
             }
-
         }
 
     }
-
 
     /**
      * 点击签到
@@ -136,7 +174,7 @@ public class SignInActivity extends Activity
     @OnClick(R.id.sign_in_btn)
     public void onViewClicked()
     {
-        if (mIsSelected)
+        if (mSelectPosition != null)
         {
             // 上传服务器，签到信息
             uploadSignInfo();
@@ -149,30 +187,41 @@ public class SignInActivity extends Activity
 
     private void uploadSignInfo()
     {
-        String course = mSignInBean.courseId;
-        String currentTime = TimeUtils.getCurrentTime();
-        String username = getSharedPreferences("username", MODE_PRIVATE).getString("username", "");
-        OkHttpUtils.post().url(Constants.USER_SIGN).addParams("course_id", course).addParams("current_time",
-                currentTime).addParams("student_no", username).addParams("position",
+        String course = mCourse.courseId;
+        String username = getSharedPreferences("user", MODE_PRIVATE).getString("username", "");
+        String date = TimeUtils.getCurrentData();
+        String time = TimeUtils.getSimpleTime();
+        Log.d(TAG, "uploadSignInfo: course" + course);
+        Log.d(TAG, "uploadSignInfo: date" + date);
+        Log.d(TAG, "uploadSignInfo: time" + time);
+        Log.d(TAG, "uploadSignInfo: seat_no" + mSelectPosition + "");
+        Log.d(TAG, "uploadSignInfo: student_no" + username);
+
+        OkHttpUtils.post().url(Constants.USER_SIGN).addParams("course_id", course).addParams("sign_time",
+                time).addParams("sign_date", date).addParams("student_no", username).addParams("seat_no",
                         mSelectPosition + "").build().execute(new StringCallback()
                         {
                             @Override
                             public void onError(Call call, Exception e, int id)
                             {
-                                Toast.makeText(SignInActivity.this, "网络异常"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignInActivity.this, "网络异常" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onResponse(String response, int id)
                             {
+                                Log.d(TAG, "onResponse: response" + response);
                                 BaseLocalModel model = JsonHelper.parseJson(response);
                                 if (model.isSucess())
                                 {
-                                    Toast.makeText(SignInActivity.this, "签到成功", Toast.LENGTH_SHORT).show();
-
-                                }else {
-                                    Toast.makeText(SignInActivity.this, model.errorInfo, Toast.LENGTH_SHORT).show();
+                                    loadSeatList();
                                 }
+                                else if ("-3".equals(model.errorNo))
+                                {
+                                    locationAdapter.notifyDataSetChanged();
+                                    mLocationRv.setEnabled(false);
+                                }
+                                Toast.makeText(SignInActivity.this, model.errorInfo, Toast.LENGTH_SHORT).show();
                             }
                         });
     }
