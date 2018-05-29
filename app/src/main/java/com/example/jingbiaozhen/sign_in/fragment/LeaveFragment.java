@@ -142,7 +142,7 @@ public class LeaveFragment extends BaseFragment implements DatePicker.OnDateChan
                     mDataSb.delete(0, mDataSb.length());
                 }
                 mLeaveTimeTv.setText(
-                        mDataSb.append(String.valueOf(year)).append("年").append(String.valueOf(month)).append(
+                        mDataSb.append(String.valueOf(year)).append("年").append(String.valueOf(month+1)).append(
                                 "月").append(day).append("日"));
                 dialog.dismiss();
             }

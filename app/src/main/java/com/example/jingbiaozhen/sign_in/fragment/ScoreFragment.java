@@ -78,7 +78,7 @@ public class ScoreFragment extends BaseFragment
                                 {
                                     JSONObject jsonObject = jsonArray.optJSONObject(i);
                                     ItemDesc itemDesc = new ItemDesc();
-                                    itemDesc.title = jsonObject.optString("course_id");
+                                    itemDesc.title = jsonObject.optString("course_name");
                                     itemDesc.desc = jsonObject.optString("score_count");
                                     itemDescs.add(itemDesc);
                                 }
