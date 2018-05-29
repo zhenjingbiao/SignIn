@@ -14,6 +14,7 @@ import com.example.jingbiaozhen.sign_in.fragment.LeaveFragment;
 import com.example.jingbiaozhen.sign_in.fragment.LeaveListFragment;
 import com.example.jingbiaozhen.sign_in.fragment.ScoreFragment;
 import com.example.jingbiaozhen.sign_in.fragment.SignInFragment;
+import com.example.jingbiaozhen.sign_in.fragment.SignListFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,9 +39,9 @@ public class HomeActivity extends FragmentActivity
     @BindView(R.id.tab)
     FragmentTabHost mTabHost;
 
-    private String[] mTitles = {"签到", "请假", "请假列表", "成绩"};
+    private String[] mTitles = {"签到", "签到列表","请假", "请假列表", "成绩"};
 
-    private Class[] mFragmentClass = {SignInFragment.class, LeaveFragment.class, LeaveListFragment.class,
+    private Class[] mFragmentClass = {SignInFragment.class, SignListFragment.class,LeaveFragment.class, LeaveListFragment.class,
             ScoreFragment.class};
 
     @Override

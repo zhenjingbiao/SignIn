@@ -30,36 +30,36 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import butterknife.BindView;
 import okhttp3.Call;
 
-public class LeaveListFragment extends BaseFragment
+public class SignListFragment extends BaseFragment
 {
 
     private static final String TAG = "LeaveListFragment";
 
-    @BindView(R.id.leave_list_rv)
-    RecyclerView mLeaveListRv;
+    @BindView(R.id.sign_list_rv)
+    RecyclerView mSignListRv;
 
     @Override
     protected int loadLayout()
     {
-        return R.layout.fragment_leave_list;
+        return R.layout.fragment_sign_list;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getLeaveList();
+        getSignList();
     }
 
-    private void getLeaveList() {
+    private void getSignList() {
         String username = mActivity.getSharedPreferences("user", Context.MODE_PRIVATE).getString("username", "");
 
-        OkHttpUtils.post().url(Constants.QUERY_LEAVE_LIST).addParams("student_no", username).build().execute(
+        OkHttpUtils.post().url(Constants.QUERY_SIGN_INFO).addParams("student_no", username).build().execute(
                 new StringCallback()
                 {
                     @Override
                     public void onError(Call call, Exception e, int id)
                     {
-                        Toast.makeText(mActivity, "查询请假列表失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, "网络异常"+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -79,13 +79,15 @@ public class LeaveListFragment extends BaseFragment
                                 {
                                     JSONObject jsonObject = jsonArray.optJSONObject(i);
                                     ItemDesc itemDesc = new ItemDesc();
-                                    itemDesc.title = jsonObject.optString("holiday_time");
-                                    itemDesc.desc = jsonObject.optString("holiday_reason");
+                                    itemDesc.title = jsonObject.optString("course_name");
+                                    String date= jsonObject.optString("sign_date");
+                                    String time= jsonObject.optString("sign_time");
+                                    itemDesc.desc =date+"-"+time;
                                     itemDescs.add(itemDesc);
                                 }
                             }
                             ListAdapter adapter = new ListAdapter(mActivity, itemDescs);
-                            mLeaveListRv.setAdapter(adapter);
+                            mSignListRv.setAdapter(adapter);
                         }
                         else
                         {
@@ -99,8 +101,8 @@ public class LeaveListFragment extends BaseFragment
     protected void initView()
     {
         LinearLayoutManager manager = new LinearLayoutManager(mActivity);
-        mLeaveListRv.addItemDecoration(new DividerItemDecoration(mActivity,DividerItemDecoration.VERTICAL));
-        mLeaveListRv.setLayoutManager(manager);
+        mSignListRv.addItemDecoration(new DividerItemDecoration(mActivity,DividerItemDecoration.VERTICAL));
+        mSignListRv.setLayoutManager(manager);
 
     }
 }

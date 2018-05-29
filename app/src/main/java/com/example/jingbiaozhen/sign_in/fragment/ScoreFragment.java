@@ -13,6 +13,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -98,6 +99,7 @@ public class ScoreFragment extends BaseFragment
     protected void initView()
     {
         LinearLayoutManager manager = new LinearLayoutManager(mActivity);
+        mScoreListRv.addItemDecoration(new DividerItemDecoration(mActivity,DividerItemDecoration.VERTICAL));
         mScoreListRv.setLayoutManager(manager);
 
     }

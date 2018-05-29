@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:gravity="center"
-        android:text="请假列表查询"
+        android:text="签到列表查询"
         android:textAlignment="center"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -20,9 +20,8 @@
         android:layout_height="0.5dp"
         android:background="@color/black"
         />
-
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/leave_list_rv"
+        android:id="@+id/sign_list_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"

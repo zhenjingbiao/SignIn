@@ -15,6 +15,6 @@
         android:gravity="center"
         android:text="首页"
         android:textColor="@drawable/tab_text"
-        android:textSize="16sp"
+        android:textSize="14sp"
         />
 </RelativeLayout>
